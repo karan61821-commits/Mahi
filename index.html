@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Happy Birthday ❤️</title>
+
+<!-- Fonts: Playfair Display for elegant display headings, Poppins for body, Dancing Script for the romantic accent -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,600&family=Poppins:wght@300;400;500;600;700&family=Dancing+Script:wght@600;700&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+  
+
+<!-- ================= AMBIENT BACKGROUND (persists across the whole site) ================= -->
+<div class="ambient" aria-hidden="true">
+  <div class="aurora"></div>
+  <div class="blur-shape shape-a"></div>
+  <div class="blur-shape shape-b"></div>
+  <div class="blur-shape shape-c"></div>
+  <canvas id="stars-canvas"></canvas>
+  <div id="hearts-field"></div>
+</div>
+
+<!-- soft glowing cursor -->
+<div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
+
+<!-- full-screen red alert flash, triggered when the NO button dodges -->
+<div class="danger-overlay" id="dangerOverlay" aria-hidden="true"></div>
+
+<!-- fireworks + confetti share one full-screen canvas layer -->
+<canvas id="fx-canvas" aria-hidden="true"></canvas>
+
+<!-- ================= 1. PASSWORD GATE ================= -->
+<section id="gate" class="screen gate">
+  <div class="glass-card gate-card">
+    <p class="eyebrow">for your eyes only</p>
+    <h1 class="gate-title">Secret Birthday Website <span class="heart-pulse">❤️</span></h1>
+    <p class="gate-subtitle">A surprise is waiting...</p>
+    <p class="gate-hint">Hint: Birthday Date</p> 
+
+    <form id="gateForm" class="gate-form" autocomplete="off">
+      <div class="input-wrap">
+        <input type="password" id="passwordInput" placeholder="Enter the password" aria-label="Password" />
+        <span class="input-underline"></span>
+      </div>
+      <button type="submit" class="btn btn-primary" id="unlockBtn">
+        <span>Unlock</span>
+        <svg viewBox="0 0 24 24" class="btn-icon"><path d="M12 2C9.79 2 8 3.79 8 6v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zm0 2c1.1 0 2 .9 2 2v3h-4V6c0-1.1.9-2 2-2z"/></svg>
+      </button>
+      <p class="gate-error" id="gateError">That's not quite it — try again 💭</p>
+    </form>
+  </div>
+</section>
+
+<!-- ================= 2. COUNTDOWN (shown right after unlock) ================= -->
+<section id="countdown" class="screen countdown hidden">
+  <div class="countdown-number" id="countdownNumber">3</div>
+  <p class="countdown-caption" id="countdownCaption">get ready...</p>
+</section>
+
+<!-- ================= MAIN SITE (revealed after countdown) ================= -->
+<main id="site" class="site hidden">
+
+  <!-- floating music control -->
+  <button id="musicToggle" class="music-fab" aria-label="Play music">
+    <svg id="musicIconPlay" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+    <svg id="musicIconPause" viewBox="0 0 24 24" class="hidden"><path d="M6 5h4v14H6zM14 5h4v14h-4z"/></svg>
+  </button>
+  <audio id="bgMusic" autoplay loop preload="none">
+    <!-- Replace src with your chosen track before publishing -->
+    <source src="song1.mp3"  type="audio/mpeg">
+  </audio>
+
+  <!-- ================= HERO ================= -->
+  <section class="hero section">
+    <p class="eyebrow reveal">a little something for</p>
+    <h1 class="hero-title">
+      <span class="hero-line">Happy Birthday</span>
+      <span class="hero-line hero-name" id="heroName" data-name>Her Name</span>
+      <span class="hero-heart">❤️</span>
+    </h1>
+    <p class="hero-typing"><span id="typingText"></span><span class="typing-cursor">|</span></p>
+
+    <div class="hero-actions reveal">
+      <button class="btn btn-ghost" id="scrollDownBtn">
+        <span>Scroll down</span>
+        <svg viewBox="0 0 24 24" class="btn-icon bounce-y"><path d="M12 16l-6-6h12z"/></svg>
+      </button>
+    </div>
+  </section>
+
+  <!-- ================= ENVELOPE ================= -->
+  <section class="section envelope-section" id="envelopeSection">
+    <p class="eyebrow reveal">before we go further</p>
+    <h2 class="section-title reveal">There's something for you</h2>
+    <p class="section-sub reveal">Tap the envelope to open it</p>
+
+    <div class="envelope-wrap reveal">
+      <div class="envelope" id="envelope">
+        <div class="envelope-back"></div>
+        <div class="letter-peek">
+          <div class="letter-peek-lines"></div>
+        </div>
+        <div class="envelope-flap"></div>
+        <div class="envelope-front-left"></div>
+        <div class="envelope-front-right"></div>
+        <div class="envelope-seal">❤️</div>
+      </div>
+      <p class="envelope-hint" id="envelopeHint">click to open</p>
+    </div>
+  </section>
+
+  <!-- ================= LETTER ================= -->
+  <section class="section letter-section hidden" id="letterSection">
+    <div class="glass-card letter-card">
+      <p class="eyebrow">a letter, just for you</p>
+      <div class="letter-body" id="letterBody">
+        <!-- Paragraphs are injected + typed by script.js from CONFIG.letter -->
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= GALLERY ================= -->
+  <section class="section gallery-section">
+    <p class="eyebrow reveal">a few favorites</p>
+    <h2 class="section-title reveal">Special Girl</h2>
+    <p class="section-sub reveal">Tap any photo to see it up close</p>
+
+    <div class="gallery-grid" id="galleryGrid">
+      <!-- Photo cards injected by script.js — swap gradients for real <img> tags when you add photos -->
+    </div>
+  </section>
+
+  <!-- lightbox -->
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" aria-label="Close">&times;</button>
+    <div class="lightbox-frame">
+      <div class="lightbox-media" id="lightboxMedia"></div>
+      <p class="lightbox-caption" id="lightboxCaption"></p>
+    </div>
+  </div>
+
+  <!-- ================= TIMELINE ================= -->
+  <section class="section timeline-section">
+    <p class="eyebrow reveal">why you're one of the best</p>
+    <h2 class="section-title reveal">Reasons You're Awesome</h2>
+
+    <div class="timeline" id="timeline">
+      <!-- Timeline cards injected by script.js from CONFIG.timeline -->
+    </div>
+  </section>
+
+  <!-- ================= GIFT ================= -->
+  <section class="section gift-section">
+    <p class="eyebrow reveal">one more surprise</p>
+    <h2 class="section-title reveal">A Little Gift</h2>
+    <p class="section-sub reveal">Go on, open it</p>
+
+    <div class="gift-wrap reveal">
+      <div class="gift-box" id="giftBox">
+        <div class="gift-lid"><span class="gift-bow">🎀</span></div>
+        <div class="gift-base"></div>
+        <div class="gift-glow"></div>
+      </div>
+      <div class="gift-message glass-card hidden" id="giftMessage">
+        <p id="giftMessageText"></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= QUOTES ================= -->
+  <section class="section quotes-section">
+    <p class="eyebrow reveal">a few small truths</p>
+    <h2 class="section-title reveal">In Case You Ever Doubt It</h2>
+
+    <div class="quotes-grid" id="quotesGrid">
+      <!-- Quote cards injected by script.js from CONFIG.quotes -->
+    </div>
+  </section>
+
+  <!-- ================= FINAL QUESTION ================= -->
+  <section class="section final-section" id="finalSection">
+    <div class="final-inner reveal">
+      <h2 class="final-title">Am I Your Favorite Person? <span>🎉</span></h2>
+      <div class="final-buttons">
+        <button class="btn btn-yes" id="yesBtn">YES 🎉</button>
+        <button class="btn btn-no" id="noBtn">NO 😜</button>
+      </div>
+      <p class="final-hint" id="finalHint">it's okay, take your time...</p>
+    </div>
+  </section>
+
+  <!-- ================= CELEBRATION (revealed after YES) ================= -->
+  <section class="section celebration-section hidden" id="celebrationSection">
+    <div class="celebration-inner">
+      <p class="eyebrow">knew it</p>
+      <h2 class="celebration-title">❤️ Thank You ❤️</h2>
+      <p class="celebration-sub">Happy Birthday, <span data-name>Her Name</span></p>
+      <p class="celebration-note">Here's to another year of everything good, all of it with you.</p>
+      <p class="scroll-cue">last scroll ↓</p>
+    </div>
+  </section>
+
+  <!-- ================= CAKE (revealed together with the celebration) ================= -->
+  <section class="section cake-section hidden" id="cakeSection">
+    <p class="eyebrow">one last thing</p>
+    <h2 class="section-title">Make A Wish</h2>
+    <p class="section-sub" id="cakeHint">Tap on candle to blow</p>
+
+    <div class="cake-wrap">
+      <div class="cake" id="cakeCandle">
+        <div class="candle">
+          <div class="flame-glow" id="flameGlow"></div>
+          <div class="flame" id="flame"></div>
+          <div class="wick"></div>
+        </div>
+
+        <!-- main cake illustration — a proper layered cake: flat frosted top,
+             straight sponge sides, drip icing over the rim, on a plate.
+             #biteHole is an invisible circle inside the mask; script.js grows
+             its radius on every tap so a real bite eats into the cake. -->
+        <svg class="cake-svg" viewBox="0 0 220 240" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <radialGradient id="frostingGrad" cx="35%" cy="30%" r="75%">
+              <stop offset="0%" stop-color="#fff3f8"/>
+              <stop offset="55%" stop-color="#ffd2e5"/>
+              <stop offset="100%" stop-color="#f79ac0"/>
+            </radialGradient>
+            <linearGradient id="sideGrad" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stop-color="#ffc3dd"/>
+              <stop offset="45%" stop-color="#ff9dc4"/>
+              <stop offset="100%" stop-color="#ef6fa3"/>
+            </linearGradient>
+            <linearGradient id="plateGrad" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff"/>
+              <stop offset="100%" stop-color="#e6dff2"/>
+            </linearGradient>
+            <mask id="biteMask" maskUnits="userSpaceOnUse" x="0" y="0" width="220" height="240">
+              <ellipse cx="110" cy="165" rx="80" ry="26" fill="#fff"/>
+              <rect x="30" y="80" width="160" height="85" fill="#fff"/>
+              <ellipse cx="110" cy="80" rx="80" ry="28" fill="#fff"/>
+              <circle id="biteHole" cx="184" cy="95" r="0" fill="#000"/>
+            </mask>
+          </defs>
+
+          <!-- plate -->
+          <ellipse class="plate-shadow" cx="110" cy="205" rx="98" ry="14" fill="#c9bfe0" opacity="0.4"/>
+          <ellipse cx="110" cy="200" rx="96" ry="15" fill="url(#plateGrad)"/>
+          <ellipse cx="110" cy="197" rx="88" ry="10" fill="#f3eefb"/>
+
+          <g id="cakeBody" mask="url(#biteMask)">
+            <!-- bottom cap -->
+            <ellipse cx="110" cy="165" rx="80" ry="26" fill="#e0568e"/>
+            <!-- sponge/frosted side wall -->
+            <rect x="30" y="80" width="160" height="85" fill="url(#sideGrad)"/>
+            <!-- cream layer stripe -->
+            <rect x="30" y="128" width="160" height="9" fill="#fff6ec" opacity="0.9"/>
+            <!-- flat frosted top -->
+            <ellipse cx="110" cy="80" rx="80" ry="28" fill="url(#frostingGrad)"/>
+            <!-- drip icing hanging from the rim -->
+            <path d="M30,80 Q110,110 190,80 L190,92 Q176,112 164,94 Q150,116 136,96 Q122,118 110,96 Q98,118 84,96 Q70,116 56,94 Q44,112 30,92 Z" fill="#ffb0d2" opacity="0.95"/>
+            <!-- piped sugar-pearl border on top -->
+            <ellipse cx="110" cy="80" rx="68" ry="22" fill="none" stroke="#ffffff" stroke-width="4" stroke-dasharray="1 9" stroke-linecap="round" opacity="0.85"/>
+            <!-- sprinkles -->
+            <g stroke="none">
+              <rect x="72" y="60" width="4" height="10" rx="2" fill="#7bd389" transform="rotate(25 74 65)"/>
+              <rect x="140" y="55" width="4" height="10" rx="2" fill="#5bb8e8" transform="rotate(-15 142 60)"/>
+              <rect x="95" y="45" width="4" height="10" rx="2" fill="#ffd23f" transform="rotate(10 97 50)"/>
+              <rect x="128" y="68" width="4" height="10" rx="2" fill="#c3a4e8" transform="rotate(60 130 73)"/>
+              <rect x="82" y="72" width="4" height="10" rx="2" fill="#f6a8c6" transform="rotate(-40 84 77)"/>
+              <rect x="155" y="65" width="4" height="10" rx="2" fill="#7bd389" transform="rotate(80 157 70)"/>
+              <rect x="65" y="70" width="4" height="10" rx="2" fill="#ffd23f" transform="rotate(-70 67 75)"/>
+              <rect x="115" y="42" width="4" height="10" rx="2" fill="#5bb8e8" transform="rotate(35 117 47)"/>
+            </g>
+            <!-- cream swirl + cherry -->
+            <path d="M95,32 q4,-15 17,-13 q13,2 9,14 q-3,11 -16,9 q-13,-2 -10,-10 Z" fill="#fff6ec" stroke="#e8ab5c" stroke-width="2"/>
+            <circle cx="106" cy="27" r="8" fill="#d6273c" stroke="#8c1626" stroke-width="2"/>
+            <circle cx="103" cy="24" r="2" fill="#ff8a94" opacity="0.85"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ================= FOOTER ================= -->
+  <footer class="footer">
+    <p>Made with ❤️ by <span data-your-name>Your Name</span></p>
+  </footer>
+
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>
