@@ -8,24 +8,24 @@
    1. DESIGN TOKENS
    --------------------------------------------------------------------- */
 :root{
-  /* palette — soft pink / lavender / rose gold / plum */
-  --blush:        #ffe3ee;
+  /* palette — dark romantic plum/violet base with pink / gold / lavender accents */
+  --blush:        #2a1533;
   --blush-deep:   #ffc4dc;
   --rose:         #f6a8c6;
   --rose-gold:    #e8b8a4;
   --lavender:     #dcc9f5;
   --lavender-deep:#c3a4e8;
-  --violet:       #9b6fd1;
-  --plum:         #5a3b7a;
-  --ink:          #3d2a4a;
-  --ink-soft:     #6b5678;
+  --violet:       #b48ee6;
+  --plum:         #faf1ff;
+  --ink:          #ece0f5;
+  --ink-soft:     #b7a0c9;
   --white:        #fffbfa;
   --white-soft:   #fff5f8;
 
-  /* glass */
-  --glass-bg: rgba(255, 251, 250, 0.55);
-  --glass-border: rgba(255, 255, 255, 0.6);
-  --glass-shadow: 0 8px 32px rgba(90, 59, 122, 0.18);
+  /* glass — frosted dark glass */
+  --glass-bg: rgba(255, 255, 255, 0.07);
+  --glass-border: rgba(255, 255, 255, 0.14);
+  --glass-shadow: 0 20px 55px rgba(0, 0, 0, 0.45);
 
   /* type */
   --font-display: 'Playfair Display', serif;
@@ -53,7 +53,7 @@ body{
   margin: 0;
   font-family: var(--font-body);
   color: var(--ink);
-  background: linear-gradient(180deg, var(--blush) 0%, var(--white-soft) 40%, var(--lavender) 100%);
+  background: linear-gradient(180deg, #170d24 0%, #241432 42%, #2f1638 78%, #1b0f27 100%);
   overflow-x: hidden;
   min-height: 100vh;
   cursor: default;
@@ -133,12 +133,12 @@ img{ max-width: 100%; display: block; }
 .btn-primary:hover{ transform: translateY(-3px); box-shadow: 0 14px 36px rgba(155, 111, 209, 0.5); }
 
 .btn-ghost{
-  background: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.06);
   color: var(--plum);
-  border: 1px solid rgba(155, 111, 209, 0.35);
+  border: 1px solid rgba(180,142,230,0.35);
   backdrop-filter: blur(10px);
 }
-.btn-ghost:hover{ transform: translateY(-3px); background: rgba(255,255,255,0.75); }
+.btn-ghost:hover{ transform: translateY(-3px); background: rgba(255,255,255,0.13); }
 
 /* ---------------------------------------------------------------------
    3. AMBIENT BACKGROUND (aurora, blur shapes, stars, hearts, cursor glow)
@@ -250,51 +250,127 @@ img{ max-width: 100%; display: block; }
 }
 .screen.fade-out{ opacity: 0; pointer-events: none; }
 
-/* --- gate --- */
-.gate-card{
-  width: 100%;
-  max-width: 420px;
-  padding: 2.8rem 2.2rem;
-  animation: cardRise 0.9s var(--ease-out);
+/* --- gate: iPhone-style passcode lock screen --- */
+.gate{
+  background:
+    radial-gradient(ellipse at 30% 15%, rgba(155,111,209,0.35), transparent 55%),
+    radial-gradient(ellipse at 75% 85%, rgba(246,168,198,0.28), transparent 55%),
+    linear-gradient(160deg, #150c22 0%, #241335 45%, #34163a 100%);
 }
 @keyframes cardRise{
   from{ opacity: 0; transform: translateY(30px) scale(0.96); }
   to{ opacity: 1; transform: translateY(0) scale(1); }
 }
-.gate-title{ font-size: clamp(1.5rem, 5vw, 1.9rem); color: var(--plum); line-height: 1.3; }
 .heart-pulse{ display: inline-block; animation: pulse 1.6s ease-in-out infinite; }
 @keyframes pulse{ 0%,100%{ transform: scale(1); } 50%{ transform: scale(1.2); } }
-.gate-subtitle{ margin-top: 0.6rem; color: var(--ink-soft); font-weight: 300; font-size: 0.95rem; }
 
-.gate-form{ margin-top: 2.2rem; display: flex; flex-direction: column; gap: 1.3rem; }
-.input-wrap{ position: relative; }
-#passwordInput{
+.lock-screen{
   width: 100%;
-  border: none;
-  background: rgba(255,255,255,0.6);
-  border-radius: var(--radius-sm);
-  padding: 0.95rem 1.1rem;
-  font-size: 1rem;
-  font-family: inherit;
-  color: var(--ink);
-  outline: none;
-  border: 1px solid rgba(155,111,209,0.25);
-  transition: box-shadow 0.3s, border-color 0.3s;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 3.4rem 1.4rem 2.2rem;
+  animation: cardRise 0.9s var(--ease-out);
+  color: #fff;
 }
-#passwordInput:focus{ border-color: var(--violet); box-shadow: 0 0 0 4px rgba(155,111,209,0.15); }
-#passwordInput::placeholder{ color: rgba(107,86,120,0.55); }
 
-.gate-error{
-  color: #d1477a;
-  font-size: 0.85rem;
+.lock-cake-wrap{ text-align: center; margin-bottom: 2.4rem; }
+.lock-cake{
+  width: 128px;
+  height: auto;
+  filter: drop-shadow(0 12px 26px rgba(0,0,0,0.4));
+  animation: cakeFloat 4s ease-in-out infinite;
+}
+@keyframes cakeFloat{
+  0%,100%{ transform: translateY(0); }
+  50%{ transform: translateY(-5px); }
+}
+.lock-flame-group{
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: lockFlicker 0.9s ease-in-out infinite alternate;
+}
+@keyframes lockFlicker{
+  0%{ transform: scale(1) rotate(-4deg); }
+  50%{ transform: scale(1.1) rotate(4deg); }
+  100%{ transform: scale(0.94) rotate(-2deg); }
+}
+.lock-cake-caption{
+  margin-top: 0.9rem;
+  font-family: var(--font-script);
+  font-weight: 700;
+  font-size: 1.35rem;
+  background: linear-gradient(120deg, var(--violet), var(--rose) 60%, var(--rose-gold));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lock-mid{ display: flex; flex-direction: column; align-items: center; gap: 0.85rem; margin-bottom: 2.4rem; }
+.lock-mid.shake{ animation: shakeCard 0.5s; }
+.lock-icon-wrap{
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.14);
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.3s;
+}
+.lock-icon{ width: 18px; height: 18px; fill: #fff; opacity: 0.92; transition: transform 0.4s var(--ease-out); }
+.lock-icon.unlocked{ transform: rotate(-14deg) translateY(-1px); }
+.lock-label{ font-size: 0.88rem; color: rgba(255,255,255,0.72); letter-spacing: 0.01em; }
+
+.passcode-dots{ display: flex; gap: 1.05rem; min-height: 14px; }
+.dot{
+  width: 13px; height: 13px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.6);
+  background: transparent;
+  transition: background 0.15s, transform 0.15s, border-color 0.15s;
+}
+.dot.filled{ background: #fff; border-color: #fff; transform: scale(1.05); }
+.lock-mid.error-glow .dot{ border-color: #ff7a90; }
+.lock-mid.error-glow .dot.filled{ background: #ff7a90; border-color: #ff7a90; }
+
+.lock-error{
+  margin-top: 0.4rem;
+  font-size: 0.82rem;
+  color: #ff8fa3;
   opacity: 0;
   height: 0;
   transition: opacity 0.3s;
 }
-.gate-error.show{ opacity: 1; height: auto; }
+.lock-error.show{ opacity: 1; height: auto; }
 
-.gate-card.shake{ animation: shakeCard 0.5s; }
-.gate-card.error-glow{ box-shadow: 0 0 0 3px rgba(209,71,122,0.45), var(--glass-shadow); }
+.keypad{
+  display: grid;
+  grid-template-columns: repeat(3, 68px);
+  gap: 1.15rem 1.6rem;
+  justify-content: center;
+}
+.key{
+  width: 68px; height: 68px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.14);
+  color: #fff;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  cursor: pointer;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.15s, transform 0.1s;
+}
+.key:active, .key.pressed{ background: rgba(255,255,255,0.3); transform: scale(0.94); }
+.key-num{ font-size: 1.55rem; font-weight: 400; line-height: 1; }
+.key-letters{ font-size: 0.52rem; letter-spacing: 0.12em; opacity: 0.7; margin-top: 3px; }
+.key-empty{ background: transparent; border: none; cursor: default; }
+.key-delete{ background: transparent; border: none; }
+.key-delete svg{ width: 25px; height: 25px; fill: #fff; opacity: 0.85; }
+.key-delete:active svg{ opacity: 0.5; }
+
+.lock-hint{ margin-top: 2rem; font-size: 0.78rem; color: rgba(255,255,255,0.5); text-align: center; }
+
 @keyframes shakeCard{
   0%,100%{ transform: translateX(0); }
   20%{ transform: translateX(-10px); }
@@ -807,9 +883,9 @@ img{ max-width: 100%; display: block; }
 }
 .btn-yes:hover{ transform: translateY(-3px) scale(1.04); }
 .btn-no{
-  background: rgba(255,255,255,0.55);
+  background: rgba(255,255,255,0.07);
   color: var(--ink-soft);
-  border: 1px solid rgba(155,111,209,0.25);
+  border: 1px solid rgba(180,142,230,0.3);
   padding: 1.05rem 2.6rem;
   font-size: 1.05rem;
   position: relative;
@@ -820,7 +896,7 @@ img{ max-width: 100%; display: block; }
 @keyframes dangerFlash{
   0%{ box-shadow: 0 0 0 0 rgba(220,38,38,0.7); border-color: rgba(220,38,38,0.8); background: rgba(255,220,220,0.85); }
   60%{ box-shadow: 0 0 0 14px rgba(220,38,38,0); }
-  100%{ box-shadow: 0 0 0 0 rgba(220,38,38,0); border-color: rgba(155,111,209,0.25); background: rgba(255,255,255,0.55); }
+  100%{ box-shadow: 0 0 0 0 rgba(220,38,38,0); border-color: rgba(180,142,230,0.3); background: rgba(255,255,255,0.07); }
 }
 
 /* full-screen red alert flash */
@@ -1071,11 +1147,14 @@ a:focus-visible, button:focus-visible, input:focus-visible{
 
 @media (max-width: 400px){
   .envelope{ width: 240px; height: 165px; }
-  .gate-card{ padding: 2.2rem 1.6rem; }
+  .lock-screen{ padding: 2.6rem 1rem 1.8rem; }
+  .keypad{ grid-template-columns: repeat(3, 62px); gap: 1rem 1.3rem; }
+  .key{ width: 62px; height: 62px; }
 }
-.gate-hint{
-  color: var(--ink-soft);
-  font-size: 0.82rem;
-  font-weight: 300;
-  opacity: 0.8;
+
+@media (max-height: 700px){
+  .lock-cake-wrap{ margin-bottom: 1.5rem; }
+  .lock-cake{ width: 104px; }
+  .lock-mid{ margin-bottom: 1.6rem; }
+  .lock-hint{ margin-top: 1.2rem; }
 }

@@ -23,7 +23,7 @@
    1. CONFIG — edit everything here, nothing else needs to change
    ========================================================================= */
 const CONFIG = {
-  password: "23oct",           // what she types to unlock the site
+  passcode: "23",              // numeric passcode typed on the lock-screen keypad — e.g. "23" for the day of her birthday. Any length works, dots adjust automatically.
   herName: "Mahi",              // shown in the hero + celebration
   yourName: "karan",                 // shown in the footer
 
@@ -201,26 +201,94 @@ function initCursorGlow(){
 }
 
 /* =========================================================================
-   4. PASSWORD GATE
+   4. PASSCODE LOCK SCREEN (iPhone-style)
    ========================================================================= */
 function initGate(){
-  const form = $("#gateForm");
-  const input = $("#passwordInput");
-  const card = $(".gate-card");
-  const error = $("#gateError");
+  const dotsWrap = $("#passcodeDots");
+  const lockMid = $("#lockMid");
+  const error = $("#lockError");
+  const lockIcon = $("#lockIcon");
+  const deleteKey = $("#keyDelete");
+  const keys = $$(".key[data-key]");
+  const passcode = String(CONFIG.passcode);
 
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    const value = input.value.trim().toLowerCase();
+  let entered = "";
+  let locked = false; // true while an error animation / unlock transition is playing
 
-    if (value === CONFIG.password.toLowerCase()) {
-      unlockSite();
+  // build the passcode dots to match the configured passcode length
+  dotsWrap.innerHTML = passcode.split("").map(() => '<span class="dot"></span>').join("");
+  const dots = $$("#passcodeDots .dot");
+
+  function updateDots(){
+    dots.forEach((dot, i) => dot.classList.toggle("filled", i < entered.length));
+  }
+
+  function pressFeedback(keyEl){
+    if (!keyEl) return;
+    keyEl.classList.add("pressed");
+    setTimeout(() => keyEl.classList.remove("pressed"), 140);
+  }
+
+  function showError(){
+    locked = true;
+    lockMid.classList.remove("shake");
+    void lockMid.offsetWidth; // restart animation
+    lockMid.classList.add("shake", "error-glow");
+    error.classList.add("show");
+    setTimeout(() => {
+      lockMid.classList.remove("shake", "error-glow");
+      entered = "";
+      updateDots();
+      locked = false;
+    }, 550);
+  }
+
+  function tryUnlock(){
+    if (entered === passcode) {
+      locked = true;
+      lockIcon.classList.add("unlocked");
+      error.classList.remove("show");
+      setTimeout(unlockSite, 350);
     } else {
-      card.classList.remove("shake");
-      void card.offsetWidth; // restart animation
-      card.classList.add("shake", "error-glow");
-      error.classList.add("show");
-      setTimeout(() => card.classList.remove("error-glow"), 600);
+      showError();
+    }
+  }
+
+  function addDigit(digit){
+    if (locked || entered.length >= passcode.length) return;
+    entered += digit;
+    error.classList.remove("show");
+    updateDots();
+    if (entered.length === passcode.length) {
+      setTimeout(tryUnlock, 150);
+    }
+  }
+
+  function removeDigit(){
+    if (locked || entered.length === 0) return;
+    entered = entered.slice(0, -1);
+    updateDots();
+  }
+
+  keys.forEach((keyEl) => {
+    keyEl.addEventListener("click", () => {
+      pressFeedback(keyEl);
+      addDigit(keyEl.dataset.key);
+    });
+  });
+
+  deleteKey.addEventListener("click", () => {
+    pressFeedback(deleteKey);
+    removeDigit();
+  });
+
+  // also accept a physical keyboard, so it's easy to test on desktop
+  document.addEventListener("keydown", (e) => {
+    if ($("#gate").classList.contains("hidden")) return;
+    if (e.key >= "0" && e.key <= "9") {
+      addDigit(e.key);
+    } else if (e.key === "Backspace") {
+      removeDigit();
     }
   });
 }

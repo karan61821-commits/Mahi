@@ -34,25 +34,97 @@
 <!-- fireworks + confetti share one full-screen canvas layer -->
 <canvas id="fx-canvas" aria-hidden="true"></canvas>
 
-<!-- ================= 1. PASSWORD GATE ================= -->
+<!-- ================= 1. PASSCODE LOCK SCREEN ================= -->
 <section id="gate" class="screen gate">
-  <div class="glass-card gate-card">
-    <p class="eyebrow">for your eyes only</p>
-    <h1 class="gate-title">Secret Birthday Website <span class="heart-pulse">❤️</span></h1>
-    <p class="gate-subtitle">A surprise is waiting...</p>
-    <p class="gate-hint">Hint: Birthday Date</p> 
+  <div class="lock-screen" id="lockScreen">
 
-    <form id="gateForm" class="gate-form" autocomplete="off">
-      <div class="input-wrap">
-        <input type="password" id="passwordInput" placeholder="Enter the password" aria-label="Password" />
-        <span class="input-underline"></span>
+    <div class="lock-cake-wrap">
+      <svg class="lock-cake" viewBox="0 0 160 150" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <defs>
+          <linearGradient id="lockCakeTop" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#fff3f8"/>
+            <stop offset="100%" stop-color="#f7a8c8"/>
+          </linearGradient>
+          <linearGradient id="lockCakeTier" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#e7a4d6"/>
+            <stop offset="50%" stop-color="#c98ee0"/>
+            <stop offset="100%" stop-color="#9b6fd1"/>
+          </linearGradient>
+          <linearGradient id="lockCakeBase" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stop-color="#caa0e8"/>
+            <stop offset="50%" stop-color="#a879d9"/>
+            <stop offset="100%" stop-color="#7c53b8"/>
+          </linearGradient>
+          <radialGradient id="lockFlameGrad" cx="50%" cy="65%" r="70%">
+            <stop offset="0%" stop-color="#fff3c4"/>
+            <stop offset="45%" stop-color="#ffb648"/>
+            <stop offset="85%" stop-color="#ff7a3d"/>
+            <stop offset="100%" stop-color="#ff7a3d" stop-opacity="0"/>
+          </radialGradient>
+        </defs>
+
+        <ellipse cx="80" cy="130" rx="56" ry="8" fill="#000" opacity="0.28"/>
+
+        <!-- bottom tier -->
+        <rect x="24" y="90" width="112" height="36" rx="7" fill="url(#lockCakeBase)"/>
+        <rect x="24" y="90" width="112" height="7" fill="#fff6ec" opacity="0.55"/>
+
+        <!-- top tier -->
+        <rect x="42" y="56" width="76" height="36" rx="6" fill="url(#lockCakeTier)"/>
+        <ellipse cx="80" cy="56" rx="38" ry="12" fill="url(#lockCakeTop)"/>
+
+        <!-- drip icing over the top rim -->
+        <path d="M42,56 Q80,74 118,56 L118,61 Q108,70 100,59 Q92,70 84,59 Q76,70 68,59 Q60,70 52,59 Q44,70 42,61 Z" fill="#ffd3e8" opacity="0.92"/>
+
+        <!-- sprinkles -->
+        <g>
+          <rect x="50" y="102" width="4" height="9" rx="2" fill="#7bd389" transform="rotate(20 52 106)"/>
+          <rect x="108" y="106" width="4" height="9" rx="2" fill="#5bb8e8" transform="rotate(-18 110 110)"/>
+          <rect x="80" y="100" width="4" height="9" rx="2" fill="#ffd23f" transform="rotate(12 82 104)"/>
+          <rect x="66" y="108" width="4" height="9" rx="2" fill="#ff9dc4" transform="rotate(-35 68 112)"/>
+        </g>
+
+        <!-- candle -->
+        <rect x="76" y="32" width="8" height="24" rx="2" fill="#fff6ec"/>
+        <rect x="76" y="40" width="8" height="5" fill="#f6a8c6"/>
+        <rect x="79" y="26" width="2" height="7" fill="#4a3a3a"/>
+
+        <!-- flame -->
+        <g class="lock-flame-group">
+          <circle cx="80" cy="18" r="15" fill="#ffb648" opacity="0.3"/>
+          <path d="M80,9 C87,16 87,22 80,26 C73,22 73,16 80,9 Z" fill="url(#lockFlameGrad)"/>
+        </g>
+      </svg>
+      <p class="lock-cake-caption">Happy Birthday, <span data-name>Her Name</span></p>
+    </div>
+
+    <div class="lock-mid" id="lockMid">
+      <div class="lock-icon-wrap">
+        <svg class="lock-icon" id="lockIcon" viewBox="0 0 24 24"><path d="M12 2C9.79 2 8 3.79 8 6v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zm0 2c1.1 0 2 .9 2 2v3h-4V6c0-1.1.9-2 2-2z"/></svg>
       </div>
-      <button type="submit" class="btn btn-primary" id="unlockBtn">
-        <span>Unlock</span>
-        <svg viewBox="0 0 24 24" class="btn-icon"><path d="M12 2C9.79 2 8 3.79 8 6v3H7a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-9a2 2 0 0 0-2-2h-1V6c0-2.21-1.79-4-4-4zm0 2c1.1 0 2 .9 2 2v3h-4V6c0-1.1.9-2 2-2z"/></svg>
+      <p class="lock-label" id="lockLabel">Enter Passcode</p>
+      <div class="passcode-dots" id="passcodeDots"></div>
+      <p class="lock-error" id="lockError">Wrong Passcode. Try Again.</p>
+    </div>
+
+    <div class="keypad" id="keypad">
+      <button type="button" class="key" data-key="1"><span class="key-num">1</span></button>
+      <button type="button" class="key" data-key="2"><span class="key-num">2</span><span class="key-letters">ABC</span></button>
+      <button type="button" class="key" data-key="3"><span class="key-num">3</span><span class="key-letters">DEF</span></button>
+      <button type="button" class="key" data-key="4"><span class="key-num">4</span><span class="key-letters">GHI</span></button>
+      <button type="button" class="key" data-key="5"><span class="key-num">5</span><span class="key-letters">JKL</span></button>
+      <button type="button" class="key" data-key="6"><span class="key-num">6</span><span class="key-letters">MNO</span></button>
+      <button type="button" class="key" data-key="7"><span class="key-num">7</span><span class="key-letters">PQRS</span></button>
+      <button type="button" class="key" data-key="8"><span class="key-num">8</span><span class="key-letters">TUV</span></button>
+      <button type="button" class="key" data-key="9"><span class="key-num">9</span><span class="key-letters">WXYZ</span></button>
+      <div class="key key-empty" aria-hidden="true"></div>
+      <button type="button" class="key" data-key="0"><span class="key-num">0</span></button>
+      <button type="button" class="key key-delete" id="keyDelete" aria-label="Delete">
+        <svg viewBox="0 0 24 24"><path d="M22 3H7c-.69 0-1.23.35-1.59.88L0 12l5.41 8.11c.36.53.9.89 1.59.89h15c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-4.34 12.71l-1.41 1.41L13 13.83l-3.25 3.29-1.41-1.41L11.59 12.5 8.34 9.21l1.41-1.41L13 11.09l3.25-3.29 1.41 1.41L14.41 12.5z"/></svg>
       </button>
-      <p class="gate-error" id="gateError">That's not quite it — try again 💭</p>
-    </form>
+    </div>
+
+    <p class="lock-hint" id="lockHint">Hint: the day of her birthday</p>
   </div>
 </section>
 
